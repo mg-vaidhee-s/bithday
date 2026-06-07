@@ -11,8 +11,7 @@
             --accent: #ff2d55;
             --accent-glow: rgba(255, 45, 85, 0.6);
             --gold: #d4af37;
-            --gold-glow: rgba(212, 175, 55, 0.4);
-            --glass: rgba(255, 255, 255, 0.03);
+            --rose-gold: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
             --glass-card: rgba(15, 10, 12, 0.6);
             --glass-border: rgba(255, 255, 255, 0.08);
             --bg-dark: #070608;
@@ -27,9 +26,8 @@
             padding: 0;
             overflow-x: hidden;
             width: 100%;
-            height: 100%;
+            min-height: 100vh;
             background-color: var(--bg-dark);
-            background: radial-gradient(circle at 50% 50%, #14080e 0%, #050306 100%);
         }
 
         * {
@@ -46,13 +44,108 @@
             perspective: 1200px;
         }
 
+        /* --- Ambient Living Canvas Engine --- */
+        .ambient-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(circle at 50% 50%, #16070f 0%, #050306 100%);
+            animation: luxuryGradientShift 12s ease-in-out infinite alternate;
+        }
+
+        @keyframes luxuryGradientShift {
+            0% { background: radial-gradient(circle at 30% 30%, #1c0813 0%, #050306 100%); }
+            50% { background: radial-gradient(circle at 70% 60%, #24050d 0%, #030205 100%); }
+            100% { background: radial-gradient(circle at 40% 80%, #15091a 0%, #060408 100%); }
+        }
+
+        /* Ambient background star field */
+        .ambient-sparkles-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-drifting-sparkle {
+            position: absolute;
+            background: radial-gradient(circle, #ffffff 20%, #ff7eb3 70%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0;
+            animation: driftUpward 5s ease-in-out infinite;
+        }
+
+        @keyframes driftUpward {
+            0% { transform: translateY(100vh) scale(0) rotate(0deg); opacity: 0; }
+            30% { opacity: 0.6; }
+            70% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.2) rotate(180deg); opacity: 0; }
+        }
+
+        /* --- Theme-Based Luxury Rose Gold & Sparkle Curtain System --- */
+        .theme-curtain {
+            position: fixed;
+            top: 0;
+            left: -110vw;
+            width: 110vw;
+            height: 100vh;
+            background: linear-gradient(105deg, 
+                transparent 0%, 
+                rgba(255, 45, 85, 0.95) 30%, 
+                #4a0010 60%, 
+                #ff7eb3 95%, 
+                #ffffff 100%);
+            box-shadow: 30px 0 120px rgba(255, 45, 85, 0.4);
+            z-index: 9999;
+            pointer-events: none;
+            transform: skewX(-10deg);
+        }
+
+        .theme-curtain.sweep {
+            animation: themeGlide 1.3s cubic-bezier(0.66, 0, 0.14, 1) forwards;
+        }
+
+        @keyframes themeGlide {
+            0% { left: -110vw; }
+            45% { left: -5vw; }
+            55% { left: -5vw; }
+            100% { left: 110vw; }
+        }
+
+        /* Dynamic Click Sparkles */
+        .trans-sparkle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            background: radial-gradient(circle, #ffffff 20%, #ff7eb3 70%, transparent 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .trans-sparkle.burst-out {
+            animation: lightRayBurst 0.9s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+        }
+
+        @keyframes lightRayBurst {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.5); opacity: 0; filter: blur(3px); }
+        }
+
         /* --- Fluid Page Layout Systems --- */
         .page {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -61,17 +154,32 @@
             text-align: center;
             visibility: hidden;
             opacity: 0;
-            transform: scale(1.08) translateZ(0);
-            transition: all 1.4s cubic-bezier(0.25, 1, 0.5, 1);
-            z-index: 1;
-            overflow-x: hidden;
+            filter: blur(10px);
+            transform: scale(0.97);
+            transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+            z-index: 2;
+            overflow: hidden;
+            background: transparent;
         }
 
         .page.active {
             visibility: visible;
             opacity: 1;
-            transform: scale(1) translateZ(0);
+            filter: blur(0px);
+            transform: scale(1);
             z-index: 10;
+        }
+
+        /* Adjust final gallery layout so scrolling works fine */
+        #gallery-page.page {
+            position: absolute;
+            height: auto;
+            min-height: 100vh;
+            overflow-y: auto;
+            display: none;
+        }
+        #gallery-page.page.active {
+            display: block;
         }
 
         /* --- Dynamic Background Particle Animations --- */
@@ -90,7 +198,7 @@
         /* --- Hero Dashboard Page --- */
         .hero-title {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(2.4rem, 8vw, 5.5rem);
+            font-size: clamp(2.2rem, 6vw, 4.5rem);
             font-weight: 900;
             font-style: italic;
             background: linear-gradient(135deg, #ffffff 10%, #ff2d55 50%, #ffd4e0 90%);
@@ -98,12 +206,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: textShine 5s linear infinite;
-            margin-bottom: 1rem;
-            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
             letter-spacing: -1px;
             display: block;
             width: 100%;
             max-width: 1200px;
+            padding: 0 10px;
         }
 
         @keyframes textShine { 
@@ -113,13 +222,14 @@
         }
 
         .hero-sub {
-            font-size: clamp(0.9rem, 2.5vw, 1.15rem);
-            letter-spacing: 6px;
+            font-size: clamp(0.85rem, 2.2vw, 1.1rem);
+            letter-spacing: 4px;
             text-transform: uppercase;
             font-weight: 300;
             color: rgba(255, 255, 255, 0.5);
             margin-bottom: 3.5rem;
             text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            padding: 0 15px;
         }
 
         /* --- Cinematic Luxury Buttons --- */
@@ -140,17 +250,18 @@
             transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
             animation: premiumPulse 2.5s infinite;
             outline: none;
+            z-index: 15;
         }
 
         .btn-neon:hover {
             background: var(--accent);
             color: #fff;
-            transform: translateY(-3px);
+            transform: translateY(-3px) scale(1.03);
             box-shadow: 0 15px 40px var(--accent-glow);
         }
 
         .btn-neon:active {
-            transform: translateY(-1px);
+            transform: translateY(-1px) scale(0.98);
         }
 
         /* --- SLIDER STORY CARD --- */
@@ -172,17 +283,16 @@
             min-height: 160px;
             align-items: center;
             justify-content: center;
-            animation: premiumFadeIn 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .step-content.active {
             display: flex;
             flex-direction: column;
-        }
-
-        @keyframes premiumFadeIn {
-            from { opacity: 0; transform: scale(0.96) translateY(10px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            opacity: 1;
+            transform: scale(1);
         }
 
         .step-text {
@@ -215,20 +325,52 @@
             box-shadow: 0 0 15px var(--accent-glow);
         }
 
-        /* --- Celebration Master Engine --- */
-        #celebration-page { background: #040305; transition: background 2.5s ease; }
-        #celebration-page.bright { background: radial-gradient(circle at center, #2e0912 0%, #050305 100%); }
+        /* --- Celebration Master Engine Ambient Morph --- */
+        .ambient-canvas.bright-mode { 
+            animation: lightTransformShift 8s ease-in-out infinite alternate;
+        }
+        @keyframes lightTransformShift {
+            0% { background: radial-gradient(circle at center, #3a0614 0%, #150207 50%, #030001 100%); }
+            100% { background: radial-gradient(circle at center, #4d0a1d 0%, #1c030a 60%, #000000 100%); }
+        }
+
+        /* --- THE DYNAMIC BUTTON FLASH BANG --- */
+        .flash-bang {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #ffffff 0%, rgba(255, 116, 146, 1) 45%, #050306 85%);
+            mix-blend-mode: screen;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .flash-bang.active {
+            animation: flashBurst 1.4s cubic-bezier(0.08, 0.8, 0.2, 1) forwards;
+        }
+        @keyframes flashBurst {
+            0% { opacity: 0; transform: scale(0.1); filter: blur(0px); }
+            12% { opacity: 1; transform: scale(1.5); filter: blur(4px); }
+            100% { opacity: 0; transform: scale(1); filter: blur(35px); }
+        }
 
         /* --- INTEGRATED FAIRY LIGHTS --- */
         .fairy-lights-container {
             position: absolute;
-            top: -10px;
+            top: -30px;
             width: 100%;
             height: 160px;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 2.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transform: translateY(-20px);
+            transition: opacity 2s cubic-bezier(0.25, 1, 0.5, 1), transform 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.1);
             z-index: 5;
+        }
+        .bright-lights .fairy-lights-container {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .wire-svg {
@@ -250,18 +392,18 @@
             background: #2b2528;
             transform-origin: top center;
             transform: translate(-50%, 0);
-            transition: all 1.2s ease;
+            transition: all 1.2s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .bright .bulb-teardrop {
+        .bright-lights .bulb-teardrop {
             background: radial-gradient(circle at 35% 35%, #ffffff, var(--bulb-warm) 55%, #a67c00);
-            box-shadow: 0 0 15px var(--bulb-glow), 0 0 30px var(--bulb-glow), 0 0 45px rgba(255, 230, 130, 0.4);
+            box-shadow: 0 0 20px var(--bulb-glow), 0 0 40px var(--bulb-glow), 0 0 60px rgba(255, 230, 130, 0.5);
             animation: luxuryFlicker var(--d) infinite alternate ease-in-out;
         }
 
         @keyframes luxuryFlicker {
-            0% { opacity: 0.5; filter: brightness(0.8) scale(0.95); }
-            100% { opacity: 1; filter: brightness(1.25) scale(1); }
+            0% { opacity: 0.6; filter: brightness(0.8) scale(0.95); }
+            100% { opacity: 1; filter: brightness(1.3) scale(1.05); }
         }
 
         /* --- THREE-DIMENSIONAL FLOATING BALLOONS --- */
@@ -319,7 +461,7 @@
             position: relative;
             width: 100vw;
             height: 100vh;
-            background: #030204;
+            background: transparent;
             overflow: hidden;
         }
 
@@ -346,7 +488,6 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            background: radial-gradient(circle, #1a0b10, #040205);
             padding: 25px;
         }
 
@@ -364,19 +505,12 @@
         }
 
         /* --- EXHIBITION PORTFOLIO GALLERY --- */
-        #gallery-page {
-            background: #060406;
-            overflow-y: auto;
-            display: block;
-            padding: 80px 20px;
-            position: relative;
-        }
-
         .gallery-title {
             font-family: 'Dancing Script', cursive;
             font-size: clamp(2.4rem, 6vw, 4.2rem);
             color: var(--accent);
             text-align: center;
+            margin-top: 40px;
             margin-bottom: 50px;
             text-shadow: 0 0 25px rgba(255, 45, 85, 0.4);
         }
@@ -387,6 +521,7 @@
             gap: 30px;
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
         }
 
         .memory-card {
@@ -486,27 +621,34 @@
 
 <body>
 
+    <!-- Unified Shared Luxury Background Engine Layers -->
+    <div class="ambient-canvas" id="global-ambient-canvas"></div>
+    <div class="ambient-sparkles-layer" id="global-ambient-sparkles"></div>
+
+    <!-- Active Swiping Transition Curtain Structure -->
+    <div class="theme-curtain" id="theme-curtain"></div>
+
     <section id="hero-page" class="page active">
         <div id="particle-container" style="position: absolute; width: 100%; height: 100%; top:0; left:0; pointer-events: none;"></div>
-        <h1 class="hero-title">Happy Birthday Apar uh!,eapovuu sirichutay happy yaaa iruuu❤️ </h1>
-        <p class="hero-sub">A small suprise gift from your brother</p>
-        <button class="btn-neon" onclick="startAppWithAudio()">Open pani paaru!!</button>
+        <h1 class="hero-title">Happy Birthday Apar uh!,eapovuu sirichutay happy yaaa iruuu❤️</h1>
+        <p class="hero-sub">A small surprise gift from your brother</p>
+        <button class="btn-neon" onclick="startAppWithAudio(event)">Open pani paaru!!</button>
     </section>
 
     <section id="message-slider-page" class="page">
         <div id="slider-particles" style="position: absolute; width: 100%; height: 100%; top:0; left:0; pointer-events: none;"></div>
         <div class="slider-card">
             <div id="step-1" class="step-content active">
-                <h2 class="step-text"> best sister in the universe... today belongs entirely to you! ✨</h2>
-                <button class="btn-neon" onclick="nextStep(2)">Next uhh</button>
+                <h2 class="step-text">best sister in the universe... today belongs entirely to you! ✨</h2>
+                <button class="btn-neon" onclick="nextStep(2, event)">Next uhh</button>
             </div>
             <div id="step-2" class="step-content">
-                <h2 class="step-text"> Ithu Paru, pathutu nalla iruka soluu na😁</h2>
-                <button class="btn-neon" onclick="nextStep(3)">Next</button>
+                <h2 class="step-text">Ithu Paru, pathutu nalla iruka soluu na😁</h2>
+                <button class="btn-neon" onclick="nextStep(3, event)">Next</button>
             </div>
             <div id="step-3" class="step-content">
-                <h2 class="step-text">Ready yaay Apar uhh? VA papoom eapdy iruku nuu! </h2>
-                <button class="btn-neon" onclick="finishSlider()">Let's Go</button>
+                <h2 class="step-text">Ready yaay Apar uhh? VA papoom eapdy iruku nuu!</h2>
+                <button class="btn-neon" onclick="finishSlider(event)">Let's Go</button>
             </div>
             <div class="slider-dots">
                 <div id="dot-1" class="dot active"></div>
@@ -517,14 +659,15 @@
     </section>
 
     <section id="celebration-page" class="page">
+        <div class="flash-bang" id="flash-bang"></div>
         <div class="fairy-lights-container" id="fairy-lights-container">
             <svg class="wire-svg" preserveAspectRatio="none" viewBox="0 0 1000 150">
                 <path id="wire-path" d="M0,20 Q100,60 200,20 T400,20 T600,20 T800,20 T1000,20" />
             </svg>
         </div>
         <div class="glass-container" style="background: transparent; border: none; box-shadow: none;">
-            <h2 id="celeb-hint" style="font-size: clamp(1.1rem, 3vw, 1.5rem); margin-bottom: 35px; letter-spacing: 3px; font-weight: 300; line-height: 1.4;">The cinematic stage is ready... </h2>
-            <button id="celeb-master-btn" class="btn-neon" onclick="celebFlow()">💡   Lights Onn</button>
+            <h2 id="celeb-hint" style="font-size: clamp(1.1rem, 3vw, 1.5rem); margin-bottom: 35px; letter-spacing: 3px; font-weight: 300; line-height: 1.4;">The cinematic stage is ready...</h2>
+            <button id="celeb-master-btn" class="btn-neon" onclick="celebFlow(event)">💡   Lights Onn</button>
         </div>
     </section>
 
@@ -543,7 +686,7 @@
                          . Have a fantastic day! ❤️
                          I’m always be with  you chellooo thangchiiii💖❤️
                     </p>
-                    <button class="btn-neon" style="margin-top: 35px; animation: none;" onclick="transitionTo('gallery-page')">📸 Explore Our Gallery</button>
+                    <button class="btn-neon" style="margin-top: 35px; animation: none;" onclick="transitionTo('gallery-page', event)">📸 Explore Our Gallery</button>
                 </div>
             </div>
         </div>
@@ -564,7 +707,7 @@
             <div class="memory-card">
                 <img src="sis2.jpeg" alt="Memory 2" class="memory-image">
                 <div class="memory-hover-overlay">
-                    <p class="hover-message">For all the endless brotherly teasing and unmatched love! </p>
+                    <p class="hover-message">For all the endless brotherly teasing and unmatched love!</p>
                 </div>
             </div>
             <div class="memory-card">
@@ -576,7 +719,7 @@
             <div class="memory-card">
                 <img src="sis4.jpeg" alt="Memory 4" class="memory-image">
                 <div class="memory-hover-overlay">
-                    <p class="hover-message">To many more chaotic and fun adventures together! </p>
+                    <p class="hover-message">To many more chaotic and fun adventures together!</p>
                 </div>
             </div>
             <div class="memory-card">
@@ -588,7 +731,7 @@
             <div class="memory-card">
                 <img src="sis6.jpeg" alt="Memory 6" class="memory-image">
                 <div class="memory-hover-overlay">
-                    <p class="hover-message">Happy Birthday, Thangachi! Always and forever. </p>
+                    <p class="hover-message">Happy Birthday, Thangachi! Always and forever.</p>
                 </div>
             </div>
         </div>
@@ -606,34 +749,90 @@
         const audioPlayer = document.getElementById('birthday-audio');
         let audioPrimed = false;
 
-        // User Gesture Intercept to cleanly prime the audio element
-        function startAppWithAudio() {
+        function startAppWithAudio(event) {
             if (audioPlayer && !audioPrimed) {
-                // Fetch and prepare the stream context silently without parsing a premature pause rule
                 audioPlayer.load();
                 audioPrimed = true;
             }
-            transitionTo('message-slider-page');
+            transitionTo('message-slider-page', event);
         }
 
-        // --- Navigation Logic ---
-        function transitionTo(pageId) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            const target = document.getElementById(pageId);
-            target.classList.add('active');
+        // --- Sparkle Shockwave Burst ---
+        function createBurst(x, y, count = 12) {
+            for (let i = 0; i < count; i++) {
+                const s = document.createElement('div');
+                s.classList.add('trans-sparkle', 'burst-out');
+                s.style.left = x + 'px';
+                s.style.top = y + 'px';
+                
+                const size = Math.random() * 8 + 4;
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
 
-            if (pageId === 'curtain-page') {
-                setTimeout(() => {
-                    document.getElementById('stage').classList.add('open');
-                    startSparkles('message-card');
-                }, 1000);
-            }
-            if (pageId === 'gallery-page') {
-                startGalleryEffects();
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 180 + 80;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance;
+
+                s.style.setProperty('--dx', dx + 'px');
+                s.style.setProperty('--dy', dy + 'px');
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 900);
             }
         }
 
-        // --- Heart Particles Core ---
+        // --- Continuous Background Ambient Star System Generator ---
+        function startAmbientStars() {
+            const container = document.getElementById('global-ambient-sparkles');
+            setInterval(() => {
+                const star = document.createElement('div');
+                star.classList.add('bg-drifting-sparkle');
+                
+                const size = Math.random() * 5 + 2;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + 'vw';
+                
+                // FIXED: Wrapped duration calculation securely inside template string quotes
+                const duration = Math.random() * 3 + 4;
+                star.style.animationDuration = `${duration}s`;
+                
+                container.appendChild(star);
+                setTimeout(() => star.remove(), 7000);
+            }, 180);
+        }
+
+        // --- Standard Page Transition Curtain Engine ---
+        function transitionTo(pageId, event) {
+            const curtain = document.getElementById('theme-curtain');
+            const currentActive = document.querySelector('.page.active');
+            const targetPage = document.getElementById(pageId);
+
+            if (event && event.clientX) {
+                createBurst(event.clientX, event.clientY);
+            }
+
+            curtain.classList.remove('sweep');
+            void curtain.offsetWidth;
+            curtain.classList.add('sweep');
+
+            setTimeout(() => {
+                if (currentActive) currentActive.classList.remove('active');
+                targetPage.classList.add('active');
+
+                if (pageId === 'curtain-page') {
+                    setTimeout(() => {
+                        document.getElementById('stage').classList.add('open');
+                        startSparkles('message-card');
+                    }, 600);
+                }
+                if (pageId === 'gallery-page') {
+                    startGalleryEffects();
+                }
+            }, 620);
+        }
+
+        // --- Background Floating Heart Core ---
         function createHeart(containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -652,58 +851,80 @@
         setInterval(() => createHeart('particle-container'), 450);
         setInterval(() => createHeart('slider-particles'), 550);
 
-        // --- Slider Navigation ---
-        function nextStep(step) {
-            document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
-            document.getElementById(`step-${step}`).classList.add('active');
-            document.getElementById(`dot-${step}`).classList.add('active');
+        // --- Card Inner-Step Switcher ---
+        function nextStep(step, event) {
+            const curtain = document.getElementById('theme-curtain');
+            const contents = document.querySelectorAll('.step-content');
+            const dots = document.querySelectorAll('.dot');
+            
+            if (event && event.clientX) {
+                createBurst(event.clientX, event.clientY);
+            }
+
+            curtain.classList.remove('sweep');
+            void curtain.offsetWidth;
+            curtain.classList.add('sweep');
+            
+            setTimeout(() => {
+                contents.forEach(s => s.classList.remove('active'));
+                dots.forEach(d => d.classList.remove('active'));
+                
+                document.getElementById(`step-${step}`).classList.add('active');
+                document.getElementById(`dot-${step}`).classList.add('active');
+            }, 620);
         }
 
-        function finishSlider() {
-            transitionTo('celebration-page');
+        function finishSlider(event) {
+            transitionTo('celebration-page', event);
         }
 
-        // --- Celebration Stage Sequence ---
+        // --- Dedicated Lights-On Sequence Engine ---
         let celebStep = 1;
-        function celebFlow() {
+        function celebFlow(event) {
             const btn = document.getElementById('celeb-master-btn');
             const hint = document.getElementById('celeb-hint');
             const page = document.getElementById('celebration-page');
-            const lights = document.getElementById('fairy-lights-container');
+            const flash = document.getElementById('flash-bang');
+            const globalBg = document.getElementById('global-ambient-canvas');
 
             if (celebStep === 1) {
-                page.classList.add('bright');
-                lights.style.opacity = '1';
-                hint.innerText = "Music turns moments into endless memories...";
-                btn.innerText = "🎵 Cue Birthday Music";
+                if (event && event.clientX) {
+                    createBurst(event.clientX, event.clientY, 40); 
+                }
+                
+                flash.classList.add('active');
+                
+                setTimeout(() => {
+                    globalBg.classList.add('bright-mode');
+                    page.classList.add('bright-lights');
+                    hint.innerText = "Music turns moments into endless memories...";
+                    btn.innerText = "🎵 oru kutyy music";
+                }, 180);
+                
+                setTimeout(() => { flash.classList.remove('active'); }, 1400);
                 celebStep = 2;
             } else if (celebStep === 2) {
                 if (audioPlayer) {
                     audioPlayer.currentTime = 0;
-                    // Play execution with a comprehensive global fallback route
                     audioPlayer.play().catch(err => {
-                        console.log("AutoPlay protection mechanism triggered:", err);
                         audioPlayer.muted = true;
-                        audioPlayer.play().then(() => {
-                            audioPlayer.muted = false;
-                        });
+                        audioPlayer.play().then(() => { audioPlayer.muted = false; });
                     });
                 }
                 hint.innerText = "Let the colors fly high across the sky!";
-                btn.innerText = "🎈 Launch Celebratory Balloons";
+                btn.innerText = "🎈 Launch the  Balloons";
                 celebStep = 3;
             } else if (celebStep === 3) {
                 spawnBalloons(document.body);
                 hint.innerText = "Arriving at the final screening...";
-                btn.innerText = "✨ Unveil Letter From Bro";
+                btn.innerText = "✨ oru kutty letter athu paaruu!!";
                 celebStep = 4;
             } else {
-                transitionTo('curtain-page');
+                transitionTo('curtain-page', event);
             }
         }
 
-        // --- Three-Dimensional Balloon Multi-Spawner ---
+        // --- Balloon Multi-Spawner ---
         function spawnBalloons(targetContainer) {
             const colorGradients = [
                 ['#ff2d55', '#7a001a'], ['#54a0ff', '#003fd1'],
@@ -727,18 +948,20 @@
             setTimeout(() => clearInterval(interval), 5000);
         }
 
-        // --- Gallery Special Art Visuals ---
+        // --- Gallery Decorative VFX ---
         function startGalleryEffects() {
             const container = document.getElementById('gallery-bg-elements');
             
             setInterval(() => {
-                if (document.getElementById('gallery-page').classList.contains('active')) {
+                const galleryPage = document.getElementById('gallery-page');
+                if (galleryPage && galleryPage.classList.contains('active')) {
                     spawnBalloons(container);
                 }
             }, 7500);
 
             setInterval(() => {
-                if (document.getElementById('gallery-page').classList.contains('active')) {
+                const galleryPage = document.getElementById('gallery-page');
+                if (galleryPage && galleryPage.classList.contains('active')) {
                     const s = document.createElement('div');
                     s.classList.add('gallery-sparkle');
                     s.style.width = s.style.height = (Math.random() * 5 + 2) + 'px';
@@ -753,19 +976,23 @@
         function startSparkles(targetId) {
             const card = document.getElementById(targetId);
             setInterval(() => {
-                const s = document.createElement('div');
-                s.classList.add('sparkle-particle');
-                s.style.width = s.style.height = (Math.random() * 4 + 2) + 'px';
-                s.style.top = Math.random() * 100 + '%';
-                s.style.left = Math.random() * 100 + '%';
-                card.appendChild(s);
-                setTimeout(() => s.remove(), 1400);
+                if(card) {
+                    const s = document.createElement('div');
+                    s.classList.add('sparkle-particle');
+                    s.style.width = s.style.height = (Math.random() * 4 + 2) + 'px';
+                    s.style.top = Math.random() * 100 + '%';
+                    s.style.left = Math.random() * 100 + '%';
+                    card.appendChild(s);
+                    setTimeout(() => s.remove(), 1400);
+                }
             }, 55);
         }
 
         function initFairyLights() {
             const container = document.getElementById('fairy-lights-container');
             const path = document.getElementById('wire-path');
+            if(!path || !container) return;
+            
             const pathLength = path.getTotalLength();
             const bulbCount = 22;
             for (let i = 0; i <= bulbCount; i++) {
@@ -782,6 +1009,7 @@
 
         window.onload = () => {
             initFairyLights();
+            startAmbientStars();
         };
     </script>
 </body>
